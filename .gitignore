@@ -1,0 +1,62 @@
+# =========================
+# Operating System & IDE Files
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# =========================
+# Spring Boot / Java / Maven
+# =========================
+# Build outputs
+target/
+build/
+.mvn/support/
+.mvn/maven.config
+hs_err_pid*
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# =========================
+# React / Node.js
+# =========================
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Production builds
+dist/
+build/
+
+# Environment variables & local configs
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Optional npm cache & logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+.npm
