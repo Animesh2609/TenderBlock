@@ -1,0 +1,6 @@
+spring.application.name=PureTender
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/dbnamehere
+spring.datasource.username=postgres
+spring.datasource.password=passwordhere
+
