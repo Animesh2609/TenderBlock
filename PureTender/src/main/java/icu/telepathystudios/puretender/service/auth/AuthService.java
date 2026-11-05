@@ -4,12 +4,14 @@ package icu.telepathystudios.puretender.service.auth;
 import icu.telepathystudios.puretender.dto.auth.AuthResponse;
 import icu.telepathystudios.puretender.dto.auth.LoginRequest;
 import icu.telepathystudios.puretender.dto.auth.RegisterRequest;
+import icu.telepathystudios.puretender.model.AccountStatus;
 import icu.telepathystudios.puretender.model.Role;
 import icu.telepathystudios.puretender.model.User;
 import icu.telepathystudios.puretender.repo.AuthRepo;
 import icu.telepathystudios.puretender.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +28,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request, Role role) {
 
         String email = normalizeEmail(request.email());
 
@@ -34,6 +36,12 @@ public class AuthService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "An account with this email already exists"
+            );
+        }
+        if (role == Role.ADMIN) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Admin registration is not allowed"
             );
         }
 
@@ -44,13 +52,12 @@ public class AuthService {
                 passwordEncoder.encode(request.password())
         );
 
-        // Public registration cannot grant privileged roles.
-        user.setRole(Role.CONTRACTOR);
+        user.setRole(role);
         user.setEnabled(true);
 
         User savedUser = authRepo.saveAndFlush(user);
 
-        String token = jwtUtil.generateToken(savedUser.getEmail(), Role.CONTRACTOR.toString());
+        String token = jwtUtil.generateToken(savedUser.getEmail(), role.name());
 
         return toAuthResponse(savedUser, token);
     }
@@ -75,6 +82,13 @@ public class AuthService {
             );
         }
 
+        if (user.getStatus() == AccountStatus.PENDING) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Your account is awaiting admin verification"
+            );
+        }
+
         if (!user.isEnabled()) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
@@ -82,7 +96,7 @@ public class AuthService {
             );
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(),  Role.CONTRACTOR.toString());
+        String token = jwtUtil.generateToken(user.getEmail(),  user.getRole().name());
 
         return toAuthResponse(user, token);
     }
