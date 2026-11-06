@@ -46,4 +46,8 @@ public class User {
     protected void onCreate() {
         createdAt = Instant.now();
     }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AccountStatus status = AccountStatus.PENDING;
 }
